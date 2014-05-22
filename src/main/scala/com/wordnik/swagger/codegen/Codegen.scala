@@ -257,6 +257,7 @@ class Codegen(config: CodegenConfig) {
         params += "dataType" -> u
         params += "getter" -> config.toGetter(param.name, u)
         params += "setter" -> config.toSetter(param.name, u)
+        params += "uppercasename" -> param.name.toUpperCase
 
         param.allowableValues match {
           case a: AllowableValues => params += "allowableValues" -> allowableValuesToString(a)
@@ -490,6 +491,7 @@ class Codegen(config: CodegenConfig) {
       val properties =
         HashMap(
           "name" -> config.toVarName(prop._1),
+          "uppercasename" -> config.toVarName(prop._1).toUpperCase,
           "nameSingular" -> {
             val name = config.toVarName(prop._1)
             if (name.endsWith("s") && name.length > 1) name.substring(0, name.length - 1) else name

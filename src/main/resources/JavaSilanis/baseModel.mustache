@@ -1,0 +1,35 @@
+package {{package}};
+
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@JsonFilter("DirtyFieldsFilter")
+public class Model implements java.io.Serializable {
+
+    @JsonIgnore
+    private Set<String> dirtyFields = new HashSet<String>();
+
+    @JsonIgnore
+    protected void setDirty(String field) {
+        dirtyFields.add(field);
+    }
+
+    @JsonIgnore
+    public boolean isDirty(String field) {
+        return dirtyFields.contains(field);
+    }
+
+    @JsonIgnore
+    public Set<String> getDirtyFields() {
+        return dirtyFields;
+    }
+
+
+    public void clean() {
+        dirtyFields.clear();
+    }
+
+}

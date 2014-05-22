@@ -1,0 +1,56 @@
+package {{package}};
+
+{{#imports}}import {{import}};
+{{/imports}}
+import com.silanis.esl.api.model.Model;
+import com.fasterxml.jackson.annotation.*;
+
+{{#models}}
+{{#model}}
+@JsonIgnoreProperties(ignoreUnknown=true)
+public class {{classname}} extends Model implements java.io.Serializable {
+
+  {{#vars}}
+  @JsonIgnore
+  public static final String FIELD_{{uppercasename}} = "{{name}}";
+  {{/vars}}
+  {{#vars}}
+
+  {{#description}}/* {{{description}}} */
+  {{/description}}
+  private {{{datatype}}} {{name}} = {{{defaultValue}}};
+  {{#allowableValues}}{{#min}} // range from {{min}} to {{max}}
+  {{/min}}
+  //{{^min}}public enum {{name}}Enum { {{#values}} {{.}}, {{/values}} }; 
+  {{/min}}
+  {{/allowableValues}}
+  
+  {{/vars}}
+  
+  {{#vars}}
+
+  public {{{datatype}}} {{getter}}() {
+    return {{name}};
+  }
+
+  public {{classname}} {{setter}}({{{datatype}}} {{name}}) {
+    setDirty(FIELD_{{uppercasename}});
+    this.{{name}} = {{name}};
+    return this;
+  }
+
+  {{/vars}}
+
+  @Override
+  public String toString()  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class {{classname}} {\n");
+    {{#vars}}
+    sb.append("  {{name}}: ").append({{name}}).append("\n");
+    {{/vars}}
+    sb.append("}\n");
+    return sb.toString();
+  }
+}
+{{/model}}
+{{/models}}

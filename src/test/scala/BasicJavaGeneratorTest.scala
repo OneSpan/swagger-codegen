@@ -130,7 +130,7 @@ class BasicJavaGeneratorTest extends FlatSpec with ShouldMatchers {
    */
   it should "quote a reserved var name" in {
   	val thrown = intercept[Exception] {
-      config.toVarName("package")
+      config.toVarName("class")
     }
     thrown should not be (null)
   }
