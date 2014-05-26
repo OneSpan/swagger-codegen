@@ -519,7 +519,8 @@ class Codegen(config: CodegenConfig) {
           "isMap" -> isMap,
           "isContainer" -> isContainer,
           "isNotContainer" -> isNotContainer,
-          "hasMore" -> "true")
+          "hasMore" -> "true",
+          (if (propertyDocSchema.qualifiedType.equals("Date")) "isDate" else "isNotDate") ->  "true")
       (config.languageSpecificPrimitives.contains(baseType) || primitives.contains(baseType)) match {
         case true => properties += "isPrimitiveType" -> "true"
         case _ => properties += "complexType" -> config.toModelName(baseType)

@@ -29,11 +29,17 @@ public class {{classname}} extends Model implements java.io.Serializable {
   
   {{#vars}}
 
+  {{#isDate}}@JsonSerialize(using = JsonDateSerializer.class)
+  {{/isDate}}
   public {{{datatype}}} {{getter}}() {
     return {{name}};
   }
 
+  {{#isDate}}@JsonDeserialize(using = JsonDateDeserializer.class)
+  {{/isDate}}
   public {{classname}} {{setter}}({{{datatype}}} {{name}}) {
+    {{#required}}SchemaSanitizer.throwOnNull(FIELD_{{uppercasename}}, {{name}});
+    {{/required}}
     setDirty(FIELD_{{uppercasename}});
     this.{{name}} = {{name}};
     return this;
