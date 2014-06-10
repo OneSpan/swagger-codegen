@@ -7,15 +7,47 @@ using Newtonsoft.Json;
 {{#model}}
 namespace {{package}} {
   internal class {{classname}} {
+
+    // Fields
+    {{#vars}}
+    {{#isList}}
+    private {{{datatype}}} {{name}} = {{{defaultValue}}};
+    {{/isList}}
+    {{/vars}}
+
+    {{lf}}
+    // Accessors
     {{#vars}}
 
+    {{lf}}
+    {{lf}}
     {{#description}}/* {{{description}}} */
     {{/description}}
     [JsonProperty("{{name}}")]
-    public {{{datatype}}} {{name}} { get; set; }
+    {{^isList}}
+    public {{{datatype}}} {{capitalName}} { get; set; }
+    {{/isList}}
+    {{#isList}}
+    public {{{datatype}}} {{capitalName}}
+    {
+        get { return {{name}}; }
+    }
+    public {{classname}} Add{{baseTypeVarName}}( {{baseTypeVarName}} value )
+    {
+        if (value == null)
+        {
+            throw new ArgumentNullException( "Argument cannot be null" );
+        }
+
+        {{name}}.Add(value);
+        return this;
+    }
+    {{/isList}}
 
     {{/vars}}
 
+    {{lf}}
+    {{lf}}
     public override string ToString()  {
       var sb = new StringBuilder();
       sb.Append("class {{classname}} {\n");

@@ -127,13 +127,14 @@ class BasicCSharpGenerator extends BasicGenerator {
     var declaredType = toDeclaredType(obj.`type`)
 
     declaredType.toLowerCase match {
-      case "array" => declaredType = "List"
+//      case "array" => declaredType = "List"
+      case "array" => declaredType = "IList"
       case e: String => e
     }
 
     val defaultValue = toDefaultValue(declaredType, obj)
     declaredType match {
-      case "List" => {
+      case "List" | "IList" => {
         val inner = {
           obj.items match {
             case Some(items) => items.ref.getOrElse(items.`type`)
@@ -145,6 +146,7 @@ class BasicCSharpGenerator extends BasicGenerator {
         }
         declaredType += "<" + toDeclaredType(inner) + ">"
       }
+      case "DateTime" => declaredType = "Nullable<" + declaredType + ">"
       case _ =>
     }
     (declaredType, defaultValue)
@@ -161,7 +163,7 @@ class BasicCSharpGenerator extends BasicGenerator {
       case "Long" => "null"
       case "Float" => "null"
       case "Double" => "null"
-      case "List" => {
+      case "List" | "IList" => {
         val inner = {
           obj.items match {
             case Some(items) => items.ref.getOrElse(items.`type`)
@@ -171,7 +173,8 @@ class BasicCSharpGenerator extends BasicGenerator {
             }
           }
         }
-        "new ArrayList<" + toDeclaredType(inner) + ">" + "()"
+//        "new ArrayList<" + toDeclaredType(inner) + ">" + "()"
+        "new List<" + toDeclaredType(inner) + ">" + "()"
       }
       case _ => "null"
     }

@@ -168,6 +168,16 @@ class Codegen(config: CodegenConfig) {
     output
   }
 
+  def generateEnumClass(data: Map[String, AnyRef]): String = {
+    val rootDir = new java.io.File(".")
+    val (resourcePath, (engine, template)) = Codegen.templates.getOrElseUpdate(data("templateFile").toString, compileTemplate(data("templateFile").toString, Some(rootDir)))
+    var output = engine.layout(resourcePath, template, data)
+
+    //  a shutdown method will be added to scalate in an upcoming release
+    engine.compiler.shutdown
+    output
+  }
+
 
   protected def compileTemplate(templateFile: String, rootDir: Option[File] = None, engine: Option[TemplateEngine] = None): (String, (TemplateEngine, Template)) = {
     val engine = new TemplateEngine(rootDir orElse Some(new File(".")))
@@ -492,6 +502,11 @@ class Codegen(config: CodegenConfig) {
         HashMap(
           "name" -> config.toVarName(prop._1),
           "uppercasename" -> config.toVarName(prop._1).toUpperCase,
+          "capitalName" -> (String.valueOf(prop._1.head).toUpperCase + prop._1.tail),
+          "add" -> {
+            val name = "add" + String.valueOf(prop._1.head).toUpperCase + prop._1.tail
+            if (name.endsWith("s") && name.length > 1) name.substring(0, name.length - 1) else name
+          },
           "nameSingular" -> {
             val name = config.toVarName(prop._1)
             if (name.endsWith("s") && name.length > 1) name.substring(0, name.length - 1) else name
@@ -508,7 +523,12 @@ class Codegen(config: CodegenConfig) {
           "baseTypeVarName" -> config.toVarName(baseType),
           "baseName" -> prop._1,
           "datatype" -> config.toDeclaration(propertyDocSchema)._1,
-          "defaultValue" -> config.toDeclaration(propertyDocSchema)._2,
+          "defaultValue" -> {
+            propertyDocSchema.allowableValues match {
+              case av: AllowableListValues => config.toDeclaration(propertyDocSchema)._1 + "." + av.values.head
+              case _ => config.toDeclaration(propertyDocSchema)._2
+            }
+          },
           "description" -> propertyDocSchema.description,
           "notes" -> propertyDocSchema.description,
           "allowableValues" -> rawAllowableValuesToString(propertyDocSchema.allowableValues),
@@ -520,7 +540,7 @@ class Codegen(config: CodegenConfig) {
           "isContainer" -> isContainer,
           "isNotContainer" -> isNotContainer,
           "hasMore" -> "true",
-          (if (propertyDocSchema.qualifiedType.equals("Date")) "isDate" else "isNotDate") ->  "true")
+          (if (propertyDocSchema.qualifiedType.equals("Date") || propertyDocSchema.qualifiedType.equals("DateTime")) "isDate" else "isNotDate") ->  "true")
       (config.languageSpecificPrimitives.contains(baseType) || primitives.contains(baseType)) match {
         case true => properties += "isPrimitiveType" -> "true"
         case _ => properties += "complexType" -> config.toModelName(baseType)

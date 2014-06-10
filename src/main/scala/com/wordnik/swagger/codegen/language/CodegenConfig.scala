@@ -39,6 +39,7 @@ abstract class CodegenConfig {
   val apiTemplateFiles = new HashMap[String, String]()
   val modelTemplateFiles = new HashMap[String, String]()
   val additionalParams = new HashMap[String, String]
+  val enumModelTemplateFiles = new HashMap[String, String]()
 
   def defaultIncludes = Set[String]()
   def languageSpecificPrimitives = Set[String]()

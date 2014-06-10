@@ -23,10 +23,9 @@ object SilanisJavaGenerator  extends BasicJavaGenerator {
   apiTemplateFiles.clear()
 
   additionalParams ++= Map(
-    "artifactId" -> "java-model",
-    "artifactVersion" -> "1.0.0",
-    "groupId" -> "com.silanis")
-
+    "artifactId" -> "esl-java-model",
+    "artifactVersion" -> "10.4.3",
+    "groupId" -> "com.silanis.esl")
 
   override def reservedWords = Set("abstract", "continue", "for", "new", "switch", "assert",
     "default", "if", "synchronized", "boolean", "do", "goto", "private",
@@ -41,4 +40,6 @@ object SilanisJavaGenerator  extends BasicJavaGenerator {
   override def supportingFiles = List(
     ("baseModel.mustache", destinationDir + java.io.File.separator + modelPackage.get.replaceAll("\\.", java.io.File.separator), "Model.java"),
     ("pom.mustache", destinationRoot, "pom.xml"))
+
+  enumModelTemplateFiles += ("enum.mustache" -> ".java")
 }

@@ -100,6 +100,20 @@ abstract class BasicGenerator extends CodegenConfig with PathUtil {
       println("wrote model " + filename)
     })
 
+    // Generate enumeration types
+    val modelEnumFiles = bundleToEnumerationModel(modelBundle, enumModelTemplateFiles.toMap)
+    modelEnumFiles.map(m => {
+      val filename = m._1
+
+      val file = new java.io.File(filename)
+      file.getParentFile().mkdirs
+
+      val fw = new FileWriter(filename, false)
+      fw.write(m._2 + "\n")
+      fw.close()
+      println("wrote model " + filename)
+    })
+
     val apiBundle = prepareApiBundle(operationMap.toMap)
     val apiFiles = bundleToSource(apiBundle, apiTemplateFiles.toMap)
 
@@ -166,8 +180,14 @@ abstract class BasicGenerator extends CodegenConfig with PathUtil {
    * creates a map of models and properties needed to write source
    */
   def prepareModelMap(models: Map[String, Model]): List[Map[String, AnyRef]] = {
+    val ignoredModels = Set("BodyPart"
+      ,"MediaType"
+      ,"MultiPart"
+      ,"FormDataMultiPart"
+      ,"ContentDisposition")
+
     (for ((name, schema) <- models) yield {
-      if (!defaultIncludes.contains(name)) {
+      if (!defaultIncludes.contains(name) && !ignoredModels.contains(name)) {
         val m = new HashMap[String, AnyRef]
         m += "name" -> toModelName(name)
         m += "className" -> name
@@ -243,5 +263,57 @@ abstract class BasicGenerator extends CodegenConfig with PathUtil {
       listToAddTo += Tuple2(apiPath, operation)
     }
     opMap.map(m => (m._1, m._2.toList)).toMap
+  }
+
+  def bundleToEnumerationModel(bundle:List[Map[String, AnyRef]], templates: Map[String, String]): List[(String, String)] = {
+    val output = new ListBuffer[(String, String)]
+    val modelMap = new HashMap[String, AnyRef]
+    var outputDir: String = ""
+    bundle.foreach(m => {
+      val models = m("models")
+      outputDir = m("outputDirectory").toString
+      models match {
+        case e: List[Tuple2[String, Model]] => {
+          modelMap ++= extractEnumerationType(e)
+        }
+      }
+    })
+    modelMap.foreach(m => {
+      for ((file, suffix) <- templates) {
+        val data = Map[String, AnyRef](
+          "templateFile" -> file,
+          "package" -> modelPackage,
+          "baseName" -> m._1,
+          "model" -> m._2)
+        output += Tuple2(outputDir + File.separator + m._1 + suffix, codegen.generateEnumClass(data))
+      }
+    })
+    output.toList
+  }
+
+  def extractEnumerationType(models: List[Tuple2[String, Model]]): HashMap[String,AnyRef] = {
+    val modelMap = new HashMap[String, AnyRef]
+
+    def extract(model: Model) = {
+      model.properties.map(prop => {
+        val propertyDocSchema = prop._2
+        val allowableValues = codegen.rawAllowableValuesToString(propertyDocSchema.allowableValues)
+        allowableValues match {
+          case a: AllowableListValues if (a.values!=List()) =>{
+            val properties = HashMap(
+              "className" -> propertyDocSchema.`type`,
+              "values" -> a.values)
+            modelMap += (propertyDocSchema.`type` -> properties)
+          }
+          case None =>
+        }
+      })
+    }
+
+    models.foreach(m => m._2 match {
+      case model: Model => extract(model)
+      case _ =>
+    })
+    modelMap
   }
 }

@@ -3,56 +3,75 @@ package {{package}};
 {{#imports}}import {{import}};
 {{/imports}}
 import com.silanis.esl.api.model.Model;
+import com.silanis.esl.api.util.JsonDateDeserializer;
+import com.silanis.esl.api.util.JsonDateSerializer;
+import com.silanis.esl.api.util.SchemaSanitizer;
 import com.fasterxml.jackson.annotation.*;
-
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 {{#models}}
 {{#model}}
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class {{classname}} extends Model implements java.io.Serializable {
 
-  {{#vars}}
-  @JsonIgnore
+  {{#vars}}@JsonIgnore
   public static final String FIELD_{{uppercasename}} = "{{name}}";
   {{/vars}}
+
+  {{lf}}
+  {{lf}}
   {{#vars}}
 
   {{#description}}/* {{{description}}} */
   {{/description}}
-  private {{{datatype}}} {{name}} = {{{defaultValue}}};
+  private {{{datatype}}} _{{name}} = {{{defaultValue}}};
   {{#allowableValues}}{{#min}} // range from {{min}} to {{max}}
   {{/min}}
-  //{{^min}}public enum {{name}}Enum { {{#values}} {{.}}, {{/values}} }; 
+  // {{^min}}public enum {{name}}Enum { {{#values}} {{.}}, {{/values}} };
   {{/min}}
   {{/allowableValues}}
-  
+
   {{/vars}}
   
   {{#vars}}
 
-  {{#isDate}}@JsonSerialize(using = JsonDateSerializer.class)
+  {{lf}}
+  {{lf}}
+  {{#isDate}}@JsonSerialize( using = JsonDateSerializer.class )
   {{/isDate}}
   public {{{datatype}}} {{getter}}() {
-    return {{name}};
+    return _{{name}};
   }
-
-  {{#isDate}}@JsonDeserialize(using = JsonDateDeserializer.class)
+  {{#isDate}}@JsonDeserialize( using = JsonDateDeserializer.class )
   {{/isDate}}
-  public {{classname}} {{setter}}({{{datatype}}} {{name}}) {
-    {{#required}}SchemaSanitizer.throwOnNull(FIELD_{{uppercasename}}, {{name}});
+  public {{classname}} {{setter}}( {{{datatype}}} value ) {
+    {{#required}}SchemaSanitizer.throwOnNull( FIELD_{{uppercasename}}, value );
     {{/required}}
-    setDirty(FIELD_{{uppercasename}});
-    this.{{name}} = {{name}};
+    setDirty( FIELD_{{uppercasename}} );
+    this._{{name}} = value;
     return this;
   }
+  {{#isList}}// List adder
+  public {{classname}} {{add}}( {{baseTypeVarName}} value ) {
+    if (value == null) {
+        throw new IllegalArgumentException( "Argument cannot be null" );
+    }
+    setDirty( FIELD_{{uppercasename}} );
+    this._{{name}}.add(value);
+    return this;
+  }
+  {{/isList}}
 
   {{/vars}}
 
+  {{lf}}
+  {{lf}}
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
     sb.append("class {{classname}} {\n");
     {{#vars}}
-    sb.append("  {{name}}: ").append({{name}}).append("\n");
+    sb.append("  {{name}}: ").append(_{{name}}).append("\n");
     {{/vars}}
     sb.append("}\n");
     return sb.toString();

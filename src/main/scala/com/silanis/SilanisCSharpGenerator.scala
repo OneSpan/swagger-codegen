@@ -14,7 +14,6 @@ object SilanisCSharpGenerator extends BasicCSharpGenerator {
   // where to write generated code
   override def destinationDir = destinationRoot + "/src/main/csharp"
 
-
   override def reservedWords = Set("abstract", "continue", "for", "new", "switch", "assert",
     "default", "if", "synchronized", "do", "goto", "private", "this", "break",
     "implements", "protected", "throw", "else", "import", "public", "throws", "case",
@@ -40,4 +39,5 @@ object SilanisCSharpGenerator extends BasicCSharpGenerator {
 
   override def supportingFiles = List()
 
+  enumModelTemplateFiles += ("enum.mustache" -> ".cs")
 }

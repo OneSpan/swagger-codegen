@@ -87,6 +87,9 @@ class BasicJavaGenerator extends BasicGenerator {
     "Array" -> "java.util.*",
     "ArrayList" -> "java.util.*",
     "List" -> "java.util.*",
+    "Map" -> "java.util.*",
+    "Map[String,Object]" -> "java.util.*",
+    "Map[string,Object]" -> "java.util.*",
     "DateTime" -> "org.joda.time.*",
     "LocalDateTime" -> "org.joda.time.*",
     "LocalDate" -> "org.joda.time.*",
@@ -178,6 +181,7 @@ class BasicJavaGenerator extends BasicGenerator {
         }
         declaredType += "<" + toDeclaredType(inner) + ">"
       }
+      case map if map.startsWith("Map") => declaredType = declaredType.replaceAll("string","String")
       case _ =>
     }
     (declaredType, defaultValue)
@@ -221,7 +225,7 @@ class BasicJavaGenerator extends BasicGenerator {
   }
 
   override def escapeReservedWord(word: String) = {
-    if (reservedWords.contains(word)) 
+    if (reservedWords.contains(word))
       throw new Exception("reserved word " + "\"" + word + "\" not allowed")
     else word
   }
