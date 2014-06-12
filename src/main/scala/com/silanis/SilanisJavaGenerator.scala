@@ -9,7 +9,7 @@ object SilanisJavaGenerator  extends BasicJavaGenerator {
   def main(args: Array[String]) = generateClient(args)
 
   // location of templates
-  override def templateDir = "JavaSilanis"
+  override def templateDir = "java-esl"
 
   // where to write generated code
   val destinationRoot = "generated-code/java"
@@ -40,6 +40,7 @@ object SilanisJavaGenerator  extends BasicJavaGenerator {
   // supporting classes
   override def supportingFiles = List(
     ("baseModel.mustache", destinationDir + java.io.File.separator + modelPackage.get.replaceAll("\\.", java.io.File.separator), "Model.java"),
+    ("result.mustache", destinationDir + java.io.File.separator + modelPackage.get.replaceAll("\\.", java.io.File.separator), "Result.java"),
     ("pom.mustache", destinationRoot, "pom.xml"))
 
   enumModelTemplateFiles += ("enum.mustache" -> ".java")

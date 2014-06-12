@@ -9,7 +9,7 @@ object SilanisCSharpGenerator extends BasicCSharpGenerator {
   def main(args: Array[String]) = generateClient(args)
 
   // location of templates
-  override def templateDir = "csharp-silanis"
+  override def templateDir = "csharp-esl"
 
   // where to write generated code
   override def destinationDir = "generated-code/csharp/src"

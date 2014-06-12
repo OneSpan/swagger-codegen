@@ -9,7 +9,7 @@ import java.util.Set;
 @JsonFilter("DirtyFieldsFilter")
 public class Model implements java.io.Serializable {
 
-    @JsonIgnore
+@JsonIgnore
     private Set<String> dirtyFields = new HashSet<String>();
 
     @JsonIgnore
