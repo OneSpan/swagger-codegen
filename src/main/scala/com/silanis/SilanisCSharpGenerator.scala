@@ -10,9 +10,9 @@ object SilanisCSharpGenerator extends BasicCSharpGenerator {
 
   // location of templates
   override def templateDir = "csharp-silanis"
-  val destinationRoot = "generated-code/csharpModel"
+
   // where to write generated code
-  override def destinationDir = destinationRoot + "/src/main/csharp"
+  override def destinationDir = "generated-code/csharp/src"
 
   override def reservedWords = Set("abstract", "continue", "for", "new", "switch", "assert",
     "default", "if", "synchronized", "do", "goto", "private", "this", "break",

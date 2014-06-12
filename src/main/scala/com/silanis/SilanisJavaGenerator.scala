@@ -10,9 +10,10 @@ object SilanisJavaGenerator  extends BasicJavaGenerator {
 
   // location of templates
   override def templateDir = "JavaSilanis"
-  val destinationRoot = "generated-code/javaSdk"
+
   // where to write generated code
-  override def destinationDir = destinationRoot + "/src/main/java"
+  val destinationRoot = "generated-code/java"
+  override def destinationDir = destinationRoot + "/src"
 
   // api invoker package
   override def invokerPackage = Some("com.silanis.esl.api")
